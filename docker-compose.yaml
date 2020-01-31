@@ -4,6 +4,7 @@ services:
   ghost:
     image: ghost:3.4.0
     networks:
+      - db
       - web
     volumes:
       - ./app:/var/lib/ghost/content:z
@@ -11,15 +12,15 @@ services:
     depends_on:
       - db
     environment:
-      url: 'https://jlee.com.br'
+      url: 'https://localhost'
       database__client: mysql
       database__connection__host: db
       database__connection__user: root
-      database__connection__password: password
+      database__connection__password: XXtNuPekvGkmKnZn
       database__connection__database: ghost
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:domain.com.br"
+      - "traefik.frontend.rule=Host:localhost"
       - "traefik.docker.network=web"
       - "traefik.port=2368"
 
@@ -30,6 +31,8 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: XXtNuPekvGkmKnZn
+    networks:
+      - db
 
   reverse-proxy:
     image: traefik:1.7
@@ -50,3 +53,5 @@ services:
 networks:
   web:
     external: true
+  db:
+    external: false
