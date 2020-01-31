@@ -1,0 +1,52 @@
+version: '3.1'
+
+services:
+  ghost:
+    image: ghost:3.4.0
+    networks:
+      - web
+    volumes:
+      - ./app:/var/lib/ghost/content:z
+    restart: always
+    depends_on:
+      - db
+    environment:
+      url: 'https://jlee.com.br'
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: root
+      database__connection__password: password
+      database__connection__database: ghost
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:domain.com.br"
+      - "traefik.docker.network=web"
+      - "traefik.port=2368"
+
+  db:
+    image: mysql:5.7
+    volumes:
+    - ./dbdata:/var/lib/mysql:z
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: XXtNuPekvGkmKnZn
+
+  reverse-proxy:
+    image: traefik:1.7
+    command: --configFile=/traefik.toml
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./acme.json:/acme.json
+    networks:
+      - web
+    depends_on:
+      - ghost
+
+networks:
+  web:
+    external: true

@@ -1,0 +1,28 @@
+# Change this if needed
+logLevel = "DEBUG"
+defaultEntryPoints = ["https","http"]
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+  [entryPoints.https.tls]
+
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "jlee.com.br"
+watch = true
+network = "web"
+exposedbydefault = false
+
+[acme]
+email = "juillian.lee@jlee.com.br"
+storage = "acme.json"
+entryPoint = "https"
+OnHostRule = true
+[acme.httpChallenge]
+entryPoint = "http"
